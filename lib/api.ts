@@ -1,7 +1,7 @@
 import { useAuthStore } from "@/lib/store/auth-store";
 import { getAccessTokenCookie } from "@/lib/auth";
 
-const API_BASE_URL = "http://localhost:7777";
+const API_BASE_URL = "https://gearops.shivamthakur.com.np";
 
 // ─── Envelope & Error ────────────────────────────────────────────────
 type ApiEnvelope<T> = {
