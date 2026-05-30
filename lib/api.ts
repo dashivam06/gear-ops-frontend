@@ -143,8 +143,12 @@ async function apiGetPublic<T>(path: string): Promise<T> {
 
 // ─── Auth ────────────────────────────────────────────────────────────
 export async function logoutAuth() {
-  await apiPostAuth<{ loggedOut: boolean }>("/api/v1/auth/logout");
+  const refreshToken = getRefreshTokenStorage();
+  await apiPostAuth<{ loggedOut: boolean }>("/api/v1/auth/logout", {
+    refreshToken: refreshToken ?? "",
+  });
 }
+
 
 export async function requestPasswordReset(email: string) {
   return apiPost<{ verificationId: string }>("/api/v1/auth/request-password-reset", { email });
