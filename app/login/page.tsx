@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useLogin, useGoogleLogin } from "@/lib/hooks/use-auth";
+import { ApiRequestError } from "@/lib/api";
 import { useAuthStore } from "@/lib/store/auth-store";
 
 function GoogleIcon({ className }: { className?: string }) {
@@ -62,6 +63,7 @@ export default function LoginPage() {
   const googleLoginMutation = useGoogleLogin();
 
   const [resetStatus, setResetStatus] = useState<"idle" | "pending" | "sent">("idle");
+  const [formError, setFormError] = useState<string | null>(null);
 
   const {
     register,
@@ -85,6 +87,7 @@ export default function LoginPage() {
   });
 
   const onSubmit = (values: LoginValues) => {
+    setFormError(null);
     loginMutation.mutate(values, {
       onSuccess: () => {
         // useAuthStore is updated by now through the onSuccess inside useMutation
@@ -97,6 +100,13 @@ export default function LoginPage() {
           router.push("/staff");
         } else {
           router.push("/dashboard");
+        }
+      },
+      onError: (error) => {
+        if (error instanceof ApiRequestError) {
+          setFormError(error.message || "Invalid credentials.");
+        } else {
+          setFormError("Login failed. Please try again.");
         }
       }
     });
@@ -129,6 +139,11 @@ export default function LoginPage() {
           </div>
 
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+            {formError ? (
+              <div className="rounded-sm border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                {formError}
+              </div>
+            ) : null}
             <div className="space-y-1.5">
               <label className={labelAuth} htmlFor="login-email">
                 Email Address
